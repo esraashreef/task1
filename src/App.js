@@ -1,117 +1,97 @@
 
 import './App.css';
- import { useState , useEffect ,useMemo} from  'react' ;
-
-import ReactPaginate from 'react-paginate';
-
-
-
-function App() {
+import React, { useMemo } from 'react'
+import { useTable, usePagination } from 'react-table'
+import MOCK_DATA from './MOCK_DATA.json'
+import { COLUMNS } from './columns'
 
 
-  const [users, setusers] = useState([]);
+export const Table = () => {
+  const columns = useMemo(() => COLUMNS, [])
+  const data = useMemo(() => MOCK_DATA, [])
 
-  useEffect(()=>{
+  const {
+    getTableProps,
+    getTableBodyProps,
+    headerGroups,
+    page,
+    nextPage,
+    previousPage,
+    canPreviousPage,
+    canNextPage,
+    pageOptions,
+    state,
+    gotoPage,
+    pageCount,
+    setPageSize,
+    prepareRow
+  } = useTable(
+    {
+      columns,
+      data,
+      initialState: { pageIndex: 2 }
+    },
+    usePagination
+  )
 
-        fetch('https://jsonplaceholder.typicode.com/users')
-        .then(res => res.json())
-        .then(data=>{
-            setusers(data)
-        })
-    }) ;
+  const { pageIndex, pageSize } = state
 
-    
-   
-  const usersPerPage = 5 ;
-  // We start with an empty list of users.
-  const [currentusers, setCurrentusers] = useState(null);
-  const [pageCount, setPageCount] = useState(0);
-  // Here we use item offsets; we could also use page offsets
-  // following the API or data you're working with.
-  const [itemOffset, setItemOffset] = useState(0);
-
-  useEffect(() => {
-    // Fetch users from another resources.
-    const endOffset = itemOffset + usersPerPage;
-    console.log(`Loading users from ${itemOffset} to ${endOffset}`);
-    { users && setCurrentusers(users.slice(itemOffset, endOffset));}
-    setPageCount(Math.ceil(users.length / usersPerPage));
-  }, [itemOffset, usersPerPage]);
-
-  // Invoke when user click to request another page.
-  const handlePageClick = (event) => {
-    const newOffset = (event.selected * usersPerPage) % users.length;
-    console.log(
-      `User requested page number ${event.selected}, which is offset ${newOffset}`
-    );
-    setItemOffset(newOffset);
-  };  
-
-    const [pageNumber, setPageNumber]= useState(1)
-    const currentPageNumber = (pageNumber * usersPerPage) - usersPerPage 
-    const paginatedPosts = users.splice(currentPageNumber, usersPerPage)
-
- 
- const handlePrev =()=>{
-        if(pageNumber === 1) return
-        setPageNumber(pageNumber - 1)
-    }
-    const handleNext =()=>{
-        setPageNumber(pageNumber + 1)
-    }
- 
-
-  // Change page
-  //const paginate = pageNumber => setCurrentPage(pageNumber);
-
-
-    //const handlePrev =()=>{
-    //   if(pageNumber === 1) return
-     //   setPageNumber(pageNumber - 1)
-    //}
-    //const handleNext =()=>{
-    //    setPageNumber(pageNumber + 1)
-    //}
-
-    
-    return (
-       
-      <>
-        <div>
-           <div>
-        
-      </div>
-      <table className="table">
+  return (
+    <>
+      <table {...getTableProps()}>
         <thead>
-          <tr>
-            <th>ID</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-          </tr>
+          {headerGroups.map(headerGroup => (
+            <tr {...headerGroup.getHeaderGroupProps()}>
+              {headerGroup.headers.map(column => (
+                <th {...column.getHeaderProps()}>{column.render('Header')}</th>
+              ))}
+            </tr>
+          ))}
         </thead>
-        <tbody>
-           {paginatedPosts && paginatedPosts.map(item => {
+        <tbody {...getTableBodyProps()}>
+          {page.map(row => {
+            prepareRow(row)
             return (
-              <tr>
-                <td>{item.id}</td>
-                <td>{item.username}</td>
-                <td>{item.name}</td>
-                
+              <tr {...row.getRowProps()}>
+                {row.cells.map(cell => {
+                  return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
+                })}
               </tr>
-            );
+            )
           })}
         </tbody>
       </table>
-      <section className="pagination">
-        <button className="first-page-btn">first</button>
-        <button onClick={handlePrev}  className="previous-page-btn">previous</button>
-        <button onClick={handleNext}  className="next-page-btn">next</button>
-        <button className="last-page-btn">last</button>
-      </section>
-    </div>
+      <div>
+        <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
+          {'First'}
+        </button>{' '}
+        <button onClick={() => previousPage()} disabled={!canPreviousPage}>
+          Previous
+        </button>{' '}
+        <button onClick={() => nextPage()} disabled={!canNextPage}>
+          Next
+        </button>{' '}
+        <button onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>
+          {'Last'}
+        </button>{' '}
+        <span>
+          Page{' '}
+          <strong>
+            {pageIndex + 1} of {pageOptions.length}
+          </strong>{' '}
+        </span>
+        
+       
+      </div>
+    </>
+  )
+}
 
-      
-      </>
-      
-    );
+function App() {
+return (
+    <div className='App'>
+      <Table />
+    </div>
+  )
+    
 }export default App;
