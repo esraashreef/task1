@@ -63,7 +63,7 @@ export const Table = () => {
       </table>
       <div>
         <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
-          {'First'}
+          First
         </button>{' '}
         <button onClick={() => previousPage()} disabled={!canPreviousPage}>
           Previous
@@ -72,7 +72,7 @@ export const Table = () => {
           Next
         </button>{' '}
         <button onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>
-          {'Last'}
+          Last
         </button>{' '}
         <span>
           Page{' '}
