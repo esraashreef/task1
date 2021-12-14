@@ -4,7 +4,7 @@ import React, { useMemo } from 'react'
 import { useTable, usePagination } from 'react-table'
 import MOCK_DATA from './MOCK_DATA.json'
 import { COLUMNS } from './columns'
-
+import './table.css'
 
 export const Table = () => {
   const columns = useMemo(() => COLUMNS, [])
@@ -29,7 +29,7 @@ export const Table = () => {
     {
       columns,
       data,
-      initialState: { pageIndex: 2 }
+      initialState: { pageIndex: 0 }
     },
     usePagination
   )
